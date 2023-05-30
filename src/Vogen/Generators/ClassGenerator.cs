@@ -9,7 +9,7 @@ public class ClassGenerator : IGenerateSourceCode
         var className = tds.Identifier;
 
         var itemUnderlyingType = item.UnderlyingTypeFullName;
-        
+
         return $@"
 using Vogen;
 
@@ -177,7 +177,7 @@ public {itemUnderlyingType} Value
         {Util.GenerateAnyConversionBodies(tds, item)}
 
         {Util.GenerateDebuggerProxyForClasses(tds, item)}
-    }}
+    }}{Util.GenerateAnyPartialClasses(tds, item)}
 {Util.WriteCloseNamespace(item.FullNamespace)}";
     }
 

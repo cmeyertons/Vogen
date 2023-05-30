@@ -18,7 +18,7 @@ using Vogen;
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute(""{Util.GenerateYourAssemblyName()}"", ""{Util.GenerateYourAssemblyVersion()}"")]
     {Util.GenerateAnyConversionAttributes(tds, item)}
     {Util.GenerateDebugAttributes(item, structName, itemUnderlyingType)}
-    { Util.GenerateModifiersFor(tds)} record struct {structName} {Util.GenerateIComparableHeaderIfNeeded(" : ", item, tds)}
+    {Util.GenerateModifiersFor(tds)} record struct {structName} {Util.GenerateIComparableHeaderIfNeeded(" : ", item, tds)}
     {{
 #if DEBUG    
         private readonly global::System.Diagnostics.StackTrace _stackTrace = null;
@@ -119,13 +119,13 @@ using Vogen;
         // record enumerates fields - we just want our Value and to throw if it's not initialized.
         {Util.GenerateToString(item)}
 
-        { InstanceGeneration.GenerateAnyInstances(tds, item)}
+        {InstanceGeneration.GenerateAnyInstances(tds, item)}
  
         {Util.GenerateAnyConversionBodies(tds, item)}
 
         {Util.GenerateDebuggerProxyForStructs(tds, item)}
 
-}}
+}}{Util.GenerateAnyPartialClasses(tds, item)}
 {Util.WriteCloseNamespace(item.FullNamespace)}";
     }
 

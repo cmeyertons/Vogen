@@ -23,15 +23,18 @@ public static class Util
         new GenerateDapperConversions(),
         new GenerateEfCoreTypeConversions(),
         new GenerateLinqToDbConversions(),
+        new GenerateOrleansConversions(),
     };
 
     static readonly IGenerateConversionAttributes[] _attributeGenerators;
     static readonly IGenerateConversionBody[] _bodyGenerators;
+    private static readonly IGenerateConversionPartialClass[] _partialClassGenerators;
 
     static Util()
     {
         _attributeGenerators = _conversionGenerators.OfType<IGenerateConversionAttributes>().ToArray();
         _bodyGenerators = _conversionGenerators.OfType<IGenerateConversionBody>().ToArray();
+        _partialClassGenerators = _conversionGenerators.OfType<IGenerateConversionPartialClass>().ToArray();
     }
 
 
@@ -110,6 +113,21 @@ public static class Util
 
     public static string GenerateModifiersFor(TypeDeclarationSyntax tds) => string.Join(" ", tds.Modifiers);
 
+    public static string GenerateDefinitionFor(TypeDeclarationSyntax tds)
+    {
+        var definition = tds switch
+        {
+            ClassDeclarationSyntax _ => "class",
+            StructDeclarationSyntax _ => "struct",
+            RecordDeclarationSyntax { ClassOrStructKeyword.Value: "struct" } => "record struct",
+            RecordDeclarationSyntax _ => "record",
+            _ => "class", // just guess class?
+        };
+
+        // TODO -- dynamicize struct / class
+        return $"{GenerateModifiersFor(tds)} {definition}";
+    }
+
     public static string WriteStartNamespace(string @namespace)
     {
         if (string.IsNullOrEmpty(@namespace))
@@ -166,6 +184,19 @@ public static class Util
         }
 
         return sb.ToString();
+    }
+
+    public static string GenerateAnyPartialClasses(TypeDeclarationSyntax tds, VoWorkItem item)
+    {
+        var sb = new StringBuilder();
+        foreach (var partialClassGenerator in _partialClassGenerators.WhereOurs(item))
+        {
+            sb.AppendLine();
+            sb.Append(partialClassGenerator.GenerateAnyPartialClass(tds, item));
+        }
+
+        return sb.ToString();
+
     }
 
     public static string GenerateDebuggerProxyForStructs(TypeDeclarationSyntax tds, VoWorkItem item)

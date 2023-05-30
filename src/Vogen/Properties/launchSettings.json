@@ -1,6 +1,7 @@
 {
   "profiles": {
-    "ConsumerTests": {
+    // just for testing -- in Vogen.Tests.csproj, project reference needs to be updated with OutputItemType="Analyzer"
+    "Vogen.Tests": {
       "commandName": "DebugRoslynComponent",
       "targetProject": "..\\..\\tests\\Vogen.Tests\\Vogen.Tests.csproj"
     }
