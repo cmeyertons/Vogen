@@ -1,11 +1,8 @@
 {
   "profiles": {
-    "Vogen": {
-      "commandName": "Project"
-    },
-    "Roslyn": {
+    "ConsumerTests": {
       "commandName": "DebugRoslynComponent",
-      "targetProject": "..\\..\\tests\\Testbench\\Testbench.csproj"
+      "targetProject": "..\\..\\tests\\ConsumerTests\\ConsumerTests.csproj"
     }
   }
 }
