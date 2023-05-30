@@ -2,7 +2,7 @@
   "profiles": {
     "ConsumerTests": {
       "commandName": "DebugRoslynComponent",
-      "targetProject": "..\\..\\tests\\ConsumerTests\\ConsumerTests.csproj"
+      "targetProject": "..\\..\\tests\\Vogen.Tests\\Vogen.Tests.csproj"
     }
   }
 }
