@@ -5,8 +5,8 @@
 # package. This will allow you run and debug debug these tests in VS, but to use any new code changes in the analyzer, you 
 # need to rerun this script to force a refresh of the package. 
 
-$artifacts = ".\artifacts"
-$localPackages = ".\local-global-packages"
+$artifacts = "$PSScriptRoot\artifacts"
+$localPackages = "$PSScriptRoot\local-global-packages"
 
 function WriteStage([string]$message)
 {
