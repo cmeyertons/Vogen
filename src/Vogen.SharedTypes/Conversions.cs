@@ -51,4 +51,9 @@ public enum Conversions
     /// Creates a LinqToDb ValueConverter for converting to and from the type
     /// </summary>
     LinqToDbValueConverter = 1 << 6,
+
+    /// <summary>
+    /// Registers the value object's type as an Orleans IConverter.  Requires [RegisterConverter] to be decorated in user-land code due to Orlean source generator dependencies
+    /// </summary>
+    OrleansConverter = 1 << 7,
 }
