@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 
 
@@ -53,6 +53,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="**\snapshots*\**;**\snap-*\**" />
     <None Remove="xunit.runner.json" />
   </ItemGroup>
 
@@ -61,9 +62,4 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="InstanceFields\" />
-  </ItemGroup>
-
 </Project>
