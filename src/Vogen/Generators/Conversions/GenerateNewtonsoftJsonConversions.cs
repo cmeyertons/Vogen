@@ -2,25 +2,17 @@
 
 namespace Vogen.Generators.Conversions;
 
-internal class GenerateNewtonsoftJsonConversions : IGenerateConversion
+internal class GenerateNewtonsoftJsonConversions : IGenerateConversionAttributes, IGenerateConversionBody
 {
+    public Vogen.Conversions Type => Vogen.Conversions.NewtonsoftJson;
+
     public string GenerateAnyAttributes(TypeDeclarationSyntax tds, VoWorkItem item)
     {
-        if (!IsOurs(item.Conversions))
-        {
-            return string.Empty;
-        }
-
         return $@"[global::Newtonsoft.Json.JsonConverter(typeof({item.VoTypeName}NewtonsoftJsonConverter))]";
     }
 
     public string GenerateAnyBody(TypeDeclarationSyntax tds, VoWorkItem item)
     {
-        if (!IsOurs(item.Conversions))
-        {
-            return string.Empty;
-        }
-
         string? code =
             Templates.TryGetForSpecificType(item.UnderlyingType, "NewtonsoftJsonConverter");
         if (code is null)
@@ -30,9 +22,7 @@ internal class GenerateNewtonsoftJsonConversions : IGenerateConversion
 
         code = code.Replace("VOTYPE", item.VoTypeName);
         code = code.Replace("VOUNDERLYINGTYPE", item.UnderlyingTypeFullName);
-        
+
         return code;
     }
-
-    private static bool IsOurs(Vogen.Conversions conversions) => conversions.HasFlag(Vogen.Conversions.NewtonsoftJson);
 }

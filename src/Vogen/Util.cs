@@ -1,9 +1,10 @@
-﻿using System;
-using System.Runtime.CompilerServices;
-using System.Text;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text;
 using Vogen.Generators.Conversions;
 
 [assembly: InternalsVisibleTo("SmallTests")]
@@ -14,7 +15,7 @@ namespace Vogen;
 
 public static class Util
 {
-    static readonly IGenerateConversion[] _conversionGenerators =
+    static readonly IGenerateConversion[] _conversionGenerators = new IGenerateConversion[]
     {
         new GenerateSystemTextJsonConversions(),
         new GenerateNewtonsoftJsonConversions(),
@@ -23,6 +24,15 @@ public static class Util
         new GenerateEfCoreTypeConversions(),
         new GenerateLinqToDbConversions(),
     };
+
+    static readonly IGenerateConversionAttributes[] _attributeGenerators;
+    static readonly IGenerateConversionBody[] _bodyGenerators;
+
+    static Util()
+    {
+        _attributeGenerators = _conversionGenerators.OfType<IGenerateConversionAttributes>().ToArray();
+        _bodyGenerators = _conversionGenerators.OfType<IGenerateConversionBody>().ToArray();
+    }
 
 
     public static string GenerateValidation(VoWorkItem workItem)
@@ -131,15 +141,12 @@ public static class Util
     /// <returns></returns>
     public static string GenerateAnyConversionAttributes(TypeDeclarationSyntax tds, VoWorkItem item)
     {
-        StringBuilder sb = new StringBuilder();
+        var sb = new StringBuilder();
 
-        foreach (var conversionGenerator in _conversionGenerators)
+        foreach (var conversionGenerator in _attributeGenerators.WhereOurs(item))
         {
             var attribute = conversionGenerator.GenerateAnyAttributes(tds, item);
-            if (!string.IsNullOrEmpty(attribute))
-            {
-                sb.AppendLine(attribute);
-            }
+            sb.AppendLine(attribute);
         }
 
         return sb.ToString();
@@ -149,10 +156,13 @@ public static class Util
 
     public static string GenerateAnyConversionBodies(TypeDeclarationSyntax tds, VoWorkItem item)
     {
-        StringBuilder sb = new StringBuilder();
-        foreach (var conversionGenerator in _conversionGenerators)
+        var sb = new StringBuilder();
+        foreach (var conversionGenerator in _bodyGenerators)
         {
-            sb.AppendLine(conversionGenerator.GenerateAnyBody(tds, item));
+            _ = conversionGenerator.IsOurs(item)
+                ? sb.AppendLine(conversionGenerator.GenerateAnyBody(tds, item))
+                : sb.AppendLine(string.Empty) // TODO -- remove this line in a subsequent PR and fix up the snapshot tests
+            ;
         }
 
         return sb.ToString();
@@ -225,7 +235,7 @@ public static class Util
         {
             return $"{precedingText} global::System.IComparable<{tds.Identifier}>, global::System.IComparable";
         }
-    
+
         return string.Empty;
     }
 
@@ -236,7 +246,7 @@ public static class Util
         {
             return string.Empty;
         }
-    
+
         var primitive = tds.Identifier;
         var s = @$"public int CompareTo({primitive} other) => Value.CompareTo(other.Value);
         public int CompareTo(object other) {{
@@ -244,8 +254,8 @@ public static class Util
             if(other is {primitive} x) return CompareTo(x);
             throw new global::System.ArgumentException(""Cannot compare to object as it is not of type {primitive}"", nameof(other));
         }}";
-    
-         return s;
+
+        return s;
     }
 
     public static string GenerateDebugAttributes(VoWorkItem item, SyntaxToken className, string itemUnderlyingType)
@@ -264,7 +274,7 @@ causes Rider's debugger to crash.
 
 */";
         }
-    
+
         return source;
     }
 }
